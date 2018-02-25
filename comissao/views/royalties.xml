@@ -25,8 +25,8 @@
               <group>
                 <group>
                   <field name="partner_id" domain="[('receive_royalties', '=', True)]" attrs="{'readonly':[('state','=','in_progress')]}" />
-                  <field name="region" attrs="{'readonly':[('state','=','in_progress')]}" />
-                  <field name="start_date" readonly="1" />
+                  <!-- <field name="region" attrs="{'readonly':[('state','=','in_progress')]}" /> -->
+                  <field name="start_date" required="1" attrs="{'readonly':[('state','=','in_progress')]}" />
                   <field name="validity_date" required="1" attrs="{'readonly':[('state','=','in_progress')]}" />
                 </group>
                 <group attrs="{'readonly':[('state','!=','draft')]}">
@@ -69,7 +69,7 @@
           <tree string="Contratos">
             <field name="name" readonly="1" />
             <field name="partner_id" />
-            <field name="region" />
+            <!-- <field name="region" /> -->
             <field name="validity_date" />
             <field name="royalty_type" />
             <field name="state" />

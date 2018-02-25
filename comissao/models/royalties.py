@@ -15,7 +15,7 @@ class Royalties(models.Model):
     name = fields.Char()
     validity_date = fields.Date(string=u"Data de Término")
     start_date = fields.Date(string=u"Data Inicial")
-    royalty_type = fields.Char(string=u"Type")
+    royalty_type = fields.Char(string=u"Referência")
     company_id = fields.Many2one("res.company", string=u"Company")
     payment_ids = fields.One2many("account.voucher", "royalties_id",
                                   readonly=True)
@@ -23,7 +23,7 @@ class Royalties(models.Model):
         'royalties.lines', 'royalties_id')
     partner_id = fields.Many2one('res.partner',
                                  string=u"Vendedor")
-    region = fields.Char(string=u"Região", size=20)
+    #region = fields.Char(string=u"Região", size=20)
     state = fields.Selection(
         [('draft', u'Rascunho'), ('in_progress', u'Em Progresso'),
          ('waiting', u'Aguardando Pagamento'), ('done', u'Concluído')],
@@ -34,7 +34,6 @@ class Royalties(models.Model):
     done = fields.Boolean(u"Contrato Concluído")
     applied_on = fields.Selection([
         ('2_global', 'Todos os Produtos'),
-        ('1_product_category', 'Categoria de Produtos'),
         ('0_product', 'Produto'), ], "Aplicar em",
         default='2_global', required=True,
         help='Defina sobre quais itens o contrato de comissão será aplicado.')
@@ -49,16 +48,20 @@ class Royalties(models.Model):
         self.royalties_payment()
 
     @api.one
-    @api.constrains('validity_date')
+    @api.constrains('validity_date', 'start_date')
     def _check_date(self):
         today = fields.date.today()
+        start_date = fields.Date.from_string(self.start_date)
         validity_date = fields.Date.from_string(self.validity_date)
-        if validity_date < today:
-            raise ValidationError(_(u"The validity date must be bigger than "
-                                    "today"))
-        elif validity_date > (today + timedelta(days=365) * 12):
-            raise ValidationError(_(u"The validity date can't be more than 12 "
-                                    "years"))
+        if start_date < today:
+            raise ValidationError(_(u"A data inicial do contrato não pode ser "
+                                    "menor que a data de hoje!"))
+        elif validity_date < today:
+            raise ValidationError(_(u"A data final do contrato deve ser maior que "
+                                    "a data inicial!"))
+        elif validity_date > (today + timedelta(days=365)):
+            raise ValidationError(_(u"O contrato não pode ter duração maior que "
+                                    "1 ano, cheque as datas!"))
 
     @api.multi
     @api.depends('actived', 'done', 'validity_date', 'payment_ids')
@@ -86,7 +89,9 @@ class Royalties(models.Model):
     @api.multi
     def button_confirm(self):
         for item in self:
-            item.start_date = fields.Date.today()
+            if item.start_date < today:
+                raise ValidationError(_(u"A data inicial do contrato não pode ser "
+                                        "menor que a data de hoje!"))
             item.actived = True
 
     @api.multi
@@ -182,6 +187,7 @@ class Royalties(models.Model):
                         list_price = roy_line.inv_line_id.product_id.list_price
                         quantity = roy_line.inv_line_id.quantity
                         price_unit = roy_line.inv_line_id.price_unit
+                        invoice_name = roy_line.inv_line_id.invoice_id.move_name
                         if roy_line.is_devol:
                             amount -= (price_unit * quantity)
                         else:
@@ -191,7 +197,7 @@ class Royalties(models.Model):
                     vals = {
                         'product_id': prod_id.id,
                         'quantity': 1,
-                        'name': u'Royalties (%s)' % (item.name),
+                        'name': u'CONTRATO DE COMISSÃO - %s / FATURA - %s' %(item.name, invoice_name),
                         'price_unit': amount * fee,
                         'account_id': journal_id.default_debit_account_id.id,
                         'company_id': company_id,

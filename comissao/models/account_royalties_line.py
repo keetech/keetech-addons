@@ -12,6 +12,7 @@ class AccountRoyaltiesLine(models.Model):
     _name = "account.royalties.line"
 
     inv_line_id = fields.Many2one('account.invoice.line', ondelete='set null')
+    inv_id = fields.Many2one('account.invoice', ondelete='set null')
     is_devol = fields.Boolean(u'Is Devolution?')
     product_id = fields.Many2one('product.product', required=True,
                                  string=u"Product", ondelete='set null')
@@ -25,7 +26,8 @@ class AccountRoyaltiesLine(models.Model):
             vals = {'inv_line_id': l.id,
                     'royalties_id': royalties_id.id,
                     'product_id': l.product_id.id,
-                    'is_devol': devol}
+                    'is_devol': devol,
+                    'inv_id': l.invoice_id.id}
             result = self.create(vals)
 
         inv_line_ids.write({'royalties_id': royalties_id.id})
@@ -62,7 +64,12 @@ class AccountRoyaltiesLine(models.Model):
                 self._create_royalties_line(roy, inv_line_devol_ids, True)
 
     def get_invoice_royaltie(self, roy_id):
-        ''''''
+        '''
+        Precorre as faturas de venda e retornam as vendas referentes ao contrato de
+        comissão
+        :param roy_id: id do contrato de comissão
+        :return: todas as vendas que se enquadram no contrato de comissão
+        '''
         invoice_line_obj = self.env['account.invoice.line']
         inv_royalties_id = self.env['royalties']
         royalties_id = inv_royalties_id.search(
@@ -75,6 +82,8 @@ class AccountRoyaltiesLine(models.Model):
         invoice_vals.append(('royalties_id', '=', False))
         invoice_vals.append(('invoice_id.user_id.partner_id','=',royalties_id.partner_id.id))
         invoice_vals.append(('invoice_id.fiscal_position_id.royalties', '=', True))
+        invoice_vals.append(('invoice_id.date_invoice','>=',royalties_id.start_date))
+        invoice_vals.append(('invoice_id.date_invoice', '<=', royalties_id.validity_date))
 
 
         inv_line_ids = invoice_line_obj.search(invoice_vals)

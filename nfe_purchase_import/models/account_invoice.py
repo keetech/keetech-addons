@@ -1,0 +1,31 @@
+# -*- coding: utf-8 -*- © 2017 Carlos R. Silveira, ATSti
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+
+from odoo import api, fields, models, _
+from datetime import date, datetime
+
+class AccountInvoice(models.Model):
+    _inherit = 'account.invoice'
+    
+    nfe_num = fields.Integer('Num. NFe')
+    nfe_serie = fields.Char('Série')
+    nfe_modelo = fields.Char('Modelo')
+    nfe_chave =  fields.Char('Chave NFe')
+    nfe_emissao = fields.Date('Data Emissão NFe')
+
+    @api.model
+    def create(self, vals):
+        invoice = super(AccountInvoice, self).create(vals)
+        purchase = invoice.invoice_line_ids.mapped('purchase_line_id.order_id')
+        if purchase and not invoice.refund_invoice_id:
+            if purchase:
+                invoice.nfe_num = purchase.nfe_num
+                invoice.nfe_serie = purchase.nfe_serie
+                invoice.nfe_modelo = purchase.nfe_modelo
+                invoice.nfe_chave = purchase.nfe_chave
+                invoice.nfe_emissao = purchase.nfe_emissao
+            message = _("This vendor bill has been created from: %s") % \
+                      (",".join(["<a href=# data-oe-model=purchase.order data-oe-id="\
+                                 +str(order.id)+">"+order.name+"</a>" for order in purchase]))
+            invoice.message_post(body=message)
+        return invoice
