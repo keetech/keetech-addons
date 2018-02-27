@@ -86,7 +86,7 @@ class Royalties(models.Model):
             elif not item.actived and not item.done:
                 item.state = 'draft'
 
-    @api.multi
+    @api.one
     def button_confirm(self):
         today = fields.date.today()
         for item in self:
