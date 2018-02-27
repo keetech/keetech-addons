@@ -89,6 +89,7 @@ class Royalties(models.Model):
     @api.multi
     def button_confirm(self):
         for item in self:
+            today = fields.date.today()
             if item.start_date < today:
                 raise ValidationError(_(u"A data inicial do contrato não pode ser "
                                         "menor que a data de hoje!"))
