@@ -85,16 +85,11 @@ class Royalties(models.Model):
                 item.state = 'done'
             elif not item.actived and not item.done:
                 item.state = 'draft'
-    """
-    @api.one
     @api.multi
     def button_confirm(self):
-        today = fields.date.today()
-        if self.start_date < today:
-            raise ValidationError(_(u"A data inicial do contrato não pode ser "
-                                        "menor que a data de hoje!"))
-        self.actived = True
-    """
+        for item in self:
+            item.start_date => fields.Date.today()
+            item.actived = True
 
     @api.multi
     def button_back_draft(self):
