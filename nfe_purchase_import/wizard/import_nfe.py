@@ -25,11 +25,6 @@ class WizardImportNfe(models.TransientModel):
     confirma = fields.Boolean(string='Confirmado?')
 
 
-
-#---------------------------------------------------------------------------------------------------------------------#
-#----------------------------------------------minha rotina-----------------------------------------------------------#
-#---------------------------------------------------------------------------------------------------------------------#
-
     def retorna_data(self, nfe):
         ide = nfe.NFe.infNFe.ide
         day = str(ide.dhEmi).split('T')
@@ -54,7 +49,6 @@ class WizardImportNfe(models.TransientModel):
         ide = nfe.NFe.infNFe.ide
         num_nfe = nfe.NFe.infNFe.ide.nNF
         chave = nfe.protNFe.infProt.chNFe
-        #dest = nfe.NFe.infNFe.dest
         emit = nfe.NFe.infNFe.emit
         partner_doc = emit.CNPJ if hasattr(emit, 'CNPJ') else emit.CPF
         partner_doc = str(partner_doc)
@@ -108,19 +102,26 @@ class WizardImportNfe(models.TransientModel):
                     if line.name == item.prod.xProd:
                         if line.product_id:
                             product = self.env['product.product'].browse(line.product_id.id)
-                            # cadastra o produto no
+                            '''
+                            Se os produtos não forem encontrados você pose
+                            informa-los através do wizard
+                            '''
                             prd_ids = {}
                             prd_ids['product_id'] = line.product_id.id
                             prd_ids['product_tmpl_id'] = line.product_id.product_tmpl_id.id
                             prd_ids['name'] = partner_id
                             prd_ids['product_name'] = str(item.prod.xProd)
-                            prd_ids['product_code'] = str(item.prod.cProd)
+                            #prd_ids['product_code'] = str(item.prod.cProd)
                             self.env['product.supplierinfo'].create(prd_ids)
                             break
                         else:
+                            '''
+                            Caso os produtos não sejam encontrados no sistema
+                            e você não os informe no wizard, eles serão cadastrados
+                            automaticamente utilizando as informações contidas no XML
+                            '''
                             vals = {}
                             vals['name'] = str(item.prod.xProd)
-                            vals['default_code'] = str(item.prod.cProd)
                             if uom_id:
                                 vals['uom_id'] = uom_id
                             else:
@@ -130,10 +131,12 @@ class WizardImportNfe(models.TransientModel):
                             vals['purchase_method'] = 'receive'
                             vals['tracking'] = 'lot'
                             ncm = str(item.prod.NCM)
-                            #ncm = '%s.%s.%s' % (ncm[:4], ncm[4:6], ncm[6:8])
                             pf_ids = self.env['product.fiscal.classification'].search([('code', '=', ncm)])
                             vals['fiscal_classification_id'] = pf_ids.id
                             product = self.env['product.product'].create(vals)
+                            # o codigo do produto sera gerado atraves do sequencial
+                            category = product.categ_id
+                            product.default_code = category.get_next_id()
                             break
         product_id = product.id
         quantidade = item.prod.qCom
@@ -163,6 +166,8 @@ class WizardImportNfe(models.TransientModel):
         purchase_dict = {}
         purchase_dict.update(self.get_main_purchase(nfe))
         order = self.env['purchase.order'].create(purchase_dict)
+        order.xml_purchase = self.nfe_xml
+        order.xml_name = "NFe-Compra%08d.xml" % purchase_dict['nfe_num']
         purchase_dict = {}
         order_id = order.id
         purchase_dict.update(self.get_items_purchase(nfe, order_id))
@@ -217,12 +222,8 @@ class WizardImportNfe(models.TransientModel):
         }
 
 
-
-
-
-
 class NotFoundProduct(models.Model):
     _name = 'not.found.products'
 
-    product_id = fields.Many2one('product.product',string="Produto do Odoo")
+    product_id = fields.Many2one('product.product',string="Produto no Sistema")
     name = fields.Char(string="Produto da NFe")

@@ -10,7 +10,9 @@ class PurchaseOrder(models.Model):
     nfe_modelo = fields.Char('Modelo')
     nfe_chave =  fields.Char('Chave NFe')
     nfe_emissao = fields.Date('Data Emissão NFe')
-    
+    xml_purchase = fields.Binary(string=u"Xml da NFe", readonly=True)
+    xml_name = fields.Char(string=u'Xml da NFe de compra', readonly=True)
+
     @api.multi
     def _prepare_invoice(self):
         import pudb;pu.db

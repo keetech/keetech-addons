@@ -88,7 +88,7 @@ class Royalties(models.Model):
     @api.multi
     def button_confirm(self):
         for item in self:
-            item.start_date => fields.Date.today()
+            item.start_date >= fields.Date.today()
             item.actived = True
 
     @api.multi
