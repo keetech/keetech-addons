@@ -7,11 +7,15 @@
         <field name="inherit_id" ref="br_purchase.view_br_purchase_invoice_supplier_form" />
         <field name="arch" type="xml">
             <field name="date" position="after">
-                <field name="nfe_num" />
-                <field name="nfe_serie" />
-                <field name="nfe_modelo" />
-                <field name="nfe_chave" />
-                <field name="nfe_emissao" />
+                <group>
+                    <group>
+                        <field name="nfe_num" />
+                        <field name="nfe_serie" />
+                        <field name="nfe_modelo" />
+                        <field name="nfe_chave" />
+                        <field name="nfe_emissao" />
+                    </group>
+                </group>
             </field>
         </field>
     </record>

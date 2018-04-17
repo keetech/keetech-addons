@@ -45,12 +45,11 @@ class WizardImportNfe(models.TransientModel):
         return partner_doc
 
     def get_main_purchase(self, nfe):
-        #import pudb;pu.db
-        ide = nfe.NFe.infNFe.ide
+        #ide = nfe.NFe.infNFe.ide
         num_nfe = nfe.NFe.infNFe.ide.nNF
         chave = nfe.protNFe.infProt.chNFe
         emit = nfe.NFe.infNFe.emit
-        partner_doc = emit.CNPJ if hasattr(emit, 'CNPJ') else emit.CPF
+        partner_doc = emit.CNPJ.text if hasattr(emit, 'CNPJ') else stremit.CPF.text
         partner_doc = str(partner_doc)
         partner_doc = self.arruma_cpf_cnpj(partner_doc)
         partner = self.env['res.partner'].search([
@@ -129,7 +128,7 @@ class WizardImportNfe(models.TransientModel):
                             vals['type'] = 'product'
                             vals['list_price'] = float(item.prod.vUnCom)
                             vals['purchase_method'] = 'receive'
-                            vals['tracking'] = 'lot'
+                            vals['tracking'] = 'none'
                             ncm = str(item.prod.NCM)
                             pf_ids = self.env['product.fiscal.classification'].search([('code', '=', ncm)])
                             vals['fiscal_classification_id'] = pf_ids.id
@@ -141,11 +140,14 @@ class WizardImportNfe(models.TransientModel):
         product_id = product.id
         quantidade = item.prod.qCom
         preco_unitario = item.prod.vUnCom
+        discount = item.prod.vDesc if hasattr(item.prod, 'vDesc') else 0.0
+        #if item.prod.vDesc:
+        #    discount = item.prod.vDesc
         datetime_obj = self.retorna_data(nfe)
         return self.env['purchase.order.line'].create({
             'product_id': product_id,'name':product.name,'date_planned':datetime_obj,
-            'product_qty': quantidade, 'price_unit': preco_unitario, 'product_uom':product.uom_id.id,
-            'order_id':order_id,'partner_id':partner_id
+            'product_qty': quantidade, 'price_unit': preco_unitario, 'valor_desconto': discount,
+            'product_uom':product.uom_id.id, 'order_id':order_id,'partner_id':partner_id
         })
 
     def get_items_purchase(self, nfe, order_id):
@@ -154,8 +156,6 @@ class WizardImportNfe(models.TransientModel):
             item = self.create_order_line(det, nfe, order_id)
             items.append((4, item.id, False))
         return {'order_line': items}
-
-
 
     @api.multi
     def action_import_nfe_purchase(self):
@@ -167,7 +167,7 @@ class WizardImportNfe(models.TransientModel):
         purchase_dict.update(self.get_main_purchase(nfe))
         order = self.env['purchase.order'].create(purchase_dict)
         order.xml_purchase = self.nfe_xml
-        order.xml_name = "NFe-Compra%08d.xml" % purchase_dict['nfe_num']
+        order.xml_name = "NFe-Compra-%08d.xml" % purchase_dict['nfe_num']
         purchase_dict = {}
         order_id = order.id
         purchase_dict.update(self.get_items_purchase(nfe, order_id))
@@ -196,7 +196,6 @@ class WizardImportNfe(models.TransientModel):
         else:
             return False
 
-
     def checa_produtos(self):
         if not self.nfe_xml:
             raise UserError('Por favor, insira um arquivo de NFe.')
@@ -221,9 +220,8 @@ class WizardImportNfe(models.TransientModel):
             'target': 'new',
         }
 
-
 class NotFoundProduct(models.Model):
     _name = 'not.found.products'
 
-    product_id = fields.Many2one('product.product',string="Produto no Sistema")
+    product_id = fields.Many2one('product.product', string="Produto no Sistema")
     name = fields.Char(string="Produto da NFe")
