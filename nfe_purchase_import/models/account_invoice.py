@@ -77,10 +77,11 @@ class AccountInvoice(models.Model):
             total, total_currency, iml = inv.with_context(ctx).compute_invoice_totals(company_currency, iml)
 
             name = inv.name or '/'
-            nfe_string = base64.b64decode(inv.xml_purchase)
-            nfe = objectify.fromstring(nfe_string)
+            if inv.type in ('in_invoice'):
+                nfe_string = base64.b64decode(inv.xml_purchase)
+                nfe = objectify.fromstring(nfe_string)
             # Se a fatura for criada através de XML importado irá percorrer as cobranças do XML
-            if inv.nfe_num != False and hasattr(nfe.NFe.infNFe, 'cobr'):
+            if inv.type in ('in_invoice') and inv.nfe_num != False and hasattr(nfe.NFe.infNFe, 'cobr'):
                 num_nfe = nfe.NFe.infNFe.ide.nNF
                 vencimentos = nfe.NFe.infNFe.cobr.dup
                 res_amount_currency = total_currency
@@ -155,7 +156,6 @@ class AccountInvoice(models.Model):
 
             journal = inv.journal_id.with_context(ctx)
             line = inv.finalize_invoice_move_lines(line)
-            print(line)
             date = inv.date or inv.date_invoice
             move_vals = {
                 'ref': inv.reference,
