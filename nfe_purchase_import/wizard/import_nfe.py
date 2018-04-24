@@ -79,6 +79,7 @@ class WizardImportNfe(models.TransientModel):
         )
 
     def create_order_line(self, item, nfe, order_id):
+        #import pudb; pu.db
         emit = nfe.NFe.infNFe.emit
         partner_doc = emit.CNPJ if hasattr(emit, 'CNPJ') else emit.CPF
         partner_id = self.env['res.partner'].search([('cnpj_cpf', '=', self.arruma_cpf_cnpj(str(partner_doc)))]).id
@@ -91,7 +92,7 @@ class WizardImportNfe(models.TransientModel):
                 ('barcode', '=', item.prod.cEAN)], limit=1)
         if not product:
             product_code = self.env['product.supplierinfo'].search([
-                ('product_code', '=', item.prod.cProd), ('name', '=', partner_id)
+                ('supplier_code', '=', item.prod.cProd), ('name', '=', partner_id)
             ])
             product = self.env['product.product'].browse(product_code.product_tmpl_id.id)
 
@@ -134,8 +135,8 @@ class WizardImportNfe(models.TransientModel):
                             vals['fiscal_classification_id'] = pf_ids.id
                             product = self.env['product.product'].create(vals)
                             # o codigo do produto sera gerado atraves do sequencial
-                            category = product.categ_id
-                            product.default_code = category.get_next_id()
+                            #category = product.categ_id
+                            #product.default_code = category.get_next_id()
                             break
         product_id = product.id
         quantidade = item.prod.qCom
@@ -175,14 +176,17 @@ class WizardImportNfe(models.TransientModel):
         order._compute_tax_id()
 
     def carrega_produtos(self, item, nfe):
+        #product = self.env['product.product'].search([
+        #    ('default_code', '=', item.prod.cProd)], limit=1)
+        #if not product:
         product = self.env['product.product'].search([
-            ('default_code', '=', item.prod.cProd)], limit=1)
-        if not product:
-            product = self.env['product.product'].search([
                 ('barcode', '=', item.prod.cEAN)], limit=1)
+        #if not product:
+        #    product = self.env['product.product'].search([
+        #        ('barcode', '=', item.prod.cEAN)], limit=1)
         if not product:
             emit = nfe.NFe.infNFe.emit
-            partner_doc = emit.CNPJ if hasattr(emit, 'CNPJ') else emit.CPF
+            partner_doc = emit.CNPJ.text if hasattr(emit, 'CNPJ') else emit.CPF
             partner_id = self.env['res.partner'].search([('cnpj_cpf', '=', self.arruma_cpf_cnpj(str(partner_doc)))]).id
             product_code = self.env['product.supplierinfo'].search([
                 ('product_code','=',item.prod.cProd),

@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_k_sale_custom_date_order_k_sale_custom_date_order,k_sale_custom_date_order.k_sale_custom_date_order,model_k_sale_custom_date_order_k_sale_custom_date_order,,1,0,0,0

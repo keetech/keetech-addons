@@ -1,0 +1,15 @@
+<odoo>
+  <data>
+     <record id="view_order_form_inherit_sale_stock_inherit_sale_custom_date_order" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale_order_dates.view_order_form_inherit_sale_stock_inherit_sale_order_dates"/>
+        <field name="arch" type="xml">
+          <xpath expr="//field[@name='requested_date']" position="replace"/>
+          <xpath expr="//field[@name='confirmation_date']" position="after">
+            <field name='requested_date' string="Data de Entrega"/>
+          </xpath>
+        </field>
+    </record>
+  </data>
+</odoo>

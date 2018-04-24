@@ -33,7 +33,7 @@ class AccountInvoice(models.Model):
                                  +str(order.id)+">"+order.name+"</a>" for order in purchase]))
             invoice.message_post(body=message)
         return invoice
-
+    '''
     def _prepare_invoice_line_from_po_line(self, line):
         res = super(AccountInvoice, self)._prepare_invoice_line_from_po_line(
             line)
@@ -41,6 +41,7 @@ class AccountInvoice(models.Model):
         #if line.xml_purchase:
         #    res['qty'] = line.product_qty - line.qty_invoiced
         return res
+    '''
 
     @api.multi
     def action_move_create(self):
