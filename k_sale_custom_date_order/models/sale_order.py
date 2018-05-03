@@ -36,7 +36,7 @@ class SaleOrder(models.Model):
                         u'O produto ( %s ) não possui Código, por favor corrija o cadastro do produto.' % (line.name))
             if not self.partner_id.cnpj_cpf:
                 errors.append(u'Cadastro do cliente não possui CNPJ/CPF.')
-            if not self.partner_id.legal_name:
+            if self.partner_id.company_type == 'company' and not self.partner_id.legal_name:
                 errors.append(u'Cadastro do cliente não possui Razão Social')
             if not self.partner_id.street:
                 errors.append(u'Cadastro do cliente não possui Endereço - Logradouro')

@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_boleto_facil_boleto_facil,boleto_facil.boleto_facil,model_boleto_facil_boleto_facil,,1,0,0,0
