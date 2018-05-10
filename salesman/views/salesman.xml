@@ -1,0 +1,123 @@
+<odoo>
+  <data>
+    <record id="salesman_partner_tree_view" model="ir.ui.view">
+      <field name="name">salesman.partner.tree</field>
+      <field name="model">salesman.partner</field>
+      <field name="arch" type="xml">
+        <tree string="Lista de Vendedores">
+          <field name="user_id"/>
+          <field name="email"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="salesman_partner_kanban_view" model="ir.ui.view">
+        <field name="name">Salesman Partner Kanban</field>
+        <field name="model">salesman.partner</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="id"/>
+                <field name="email"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click">
+                          <strong class="o_kanban_record_title"><field name="user_id"/></strong>
+                                <div class="oe_kanban_details">
+                                  <div class="o_kanban_tags_section">
+                                    <field name="email" widget="email"/>
+                                  </div>
+                                  <div>
+                                    <ul>
+                                      <li><field name="count_sales_month"/></li>
+                                      <li><field name="sales_goal"/></li>
+                                      <li><field name="amount_sales_month"/></li>
+                                    </ul>
+                                  </div>
+                                  <div>
+                                    <field name="sales_goal_reached" string="Meta de Vendas do Mês"
+                                       widget="percentpie">
+                                    </field>
+                                  </div>
+                              </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="salesman_partner_form_view" model="ir.ui.view">
+        <field name="name">Salesman Partner Form</field>
+        <field name="model">salesman.partner</field>
+        <field name="arch" type="xml">
+          <form string="Formulário de Vendedores">
+            <sheet>
+              <field name="name" invisible="1"/>
+              <field name="currency_id" invisible="1"/>
+              <div class="oe_title">
+                <label for="user_id" class="oe_edit_only"/>
+                <h1>
+                  <field name="user_id" required="1"/>
+                </h1>
+                <group>
+                  <field name="email" widget="email"/>
+			    </group>
+              </div>
+              <group>
+                <group>
+                  <field name="sales_goal" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                </group>
+                <group>
+                  <field name="sales_goal_reached" widget="progressbar" string="Percentual da Meta Atingido" readonly="1"/>
+                </group>
+              </group>
+              <group>
+                <group string="Totais de Vendas">
+                  <field name="count_sales" string="Quantidade"/>
+                  <field name="amount_sales" string="Valor" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                </group>
+                <group string="Totais de Vendas no Mês">
+                  <field name="count_sales_month" string="Quantidade"/>
+                  <field name="amount_sales_month" string="Valor" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                </group>
+              </group>
+              <notebook>
+                  <page string="Alçada de Descontos">
+                      <field name="discountlimits_line" mode="tree">
+                          <tree string="Limites de Descontos" editable="top">
+                            <field name="salesman_id" invisible="1"/>
+                            <field name="product_id" string="Desconto Por Produto         " attrs="{'readonly':[('category_id','!=',False)]}"/>
+                            <field name="category_id" string="Desconto Por Categoria de Produtos" attrs="{'readonly':[('product_id','!=',False)]}"/>
+                            <field name="limit_discount" string="Lim. de Desc. (%)"/>
+                          </tree>
+                      </field>
+                  </page>
+                <page string="Carteira de Clientes">
+                  <field name="portfolio_customer" widget="many2many_list"
+                  domain="[('customer','=',True)]"/>
+                </page>
+              </notebook>
+            </sheet>
+          </form>
+        </field>
+    </record>
+
+    <record id="action_salesman_partner" model="ir.actions.act_window">
+        <field name="name">Vendedores</field>
+        <field name="res_model">salesman.partner</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="salesman_menu"
+            name="Administração de Vendas"
+            parent="sale.sale_menu_root"
+            groups="sales_team.group_sale_manager"
+            sequence="5"/>
+
+    <menuitem name="Vendedor" id="salesman.salesman_manager"
+              action="action_salesman_partner"
+              parent="salesman_menu"/>
+
+  </data>
+</odoo>
