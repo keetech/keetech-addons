@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="salesman_perm_rule" model="ir.rule">
+            <field name="name">Permissão acesso Clientes / Salesman Portfolio</field>
+            <field name="model_id" ref="base.model_res_partner"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|',('portfolio_salesman','=',False),('portfolio_salesman.user_id','in',[user.id])]</field>
+        </record>
+    </data>
+</odoo>

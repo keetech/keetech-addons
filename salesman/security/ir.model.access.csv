@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_salesman_partner,salesman.salesman_partner,model_salesman_partner,sales_team.group_sale_manager,1,1,1,1
+access_salesman_discount,salesman.salesman_discount,model_salesman_discount_limits,sales_team.group_sale_manager,1,1,1,1
+access_salesman_partner,salesman.salesman_partner,model_salesman_partner,sales_team.group_sale_salesman,1,0,0,0
+access_salesman_discount,salesman.salesman_discount,model_salesman_discount_limits,sales_team.group_sale_salesman,1,0,0,0
+access_account_analytic_account_salesman,account_analytic_account salesman,analytic.model_account_analytic_account,sales_team.group_sale_salesman,1,1,1,1
+access_sale_order_manager,sale.order.manager,model_sale_order,sales_team.group_sale_salesman,1,1,1,1

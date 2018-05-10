@@ -1,0 +1,42 @@
+<odoo>
+    <record model="ir.ui.view" id="salesman.discount_user_form">
+        <field name="name">wizard.sale.order.line.discount.user.form</field>
+        <field name="model">discount.approve</field>
+        <field name="arch" type="xml">
+            <form string="Descontos Acima do Permitido">
+                <field name="user_id" invisible="1"/>
+                <field name="discounts_line" mode="tree" create="false" edit="false">
+                    <tree string="Descontos Pendentes aguardando aprovação" editable='bottom'>
+                        <field name="sale_order_line" invisible="1" readonly="1"/>
+                        <field name="product_id"/>
+                        <field name="salesman"/>
+                        <field name="price_unit"/>
+                        <field name="product_uom_qty"/>
+                        <field name="product_uom" invisible="1"/>
+                        <field name="discount"/>
+                        <field name="amount_discount"/>
+                        <field name="amount_without_discount"/>
+                        <field name="amount_total"/>
+                        <button name="approve_discount" type="object" string="Aprovar" icon="fa-check-circle"/>
+                        <button name="refuse_discount" type="object" string="Reprovar" icon="fa-times-circle"/>
+                    </tree>
+                </field>
+                <footer>
+                    <button string="Cancelar" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_discounts_approve" model="ir.actions.act_window">
+        <field name="name">Descontos Pendentes de Aprovação</field>
+        <field name="res_model">discount.approve</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem name="Aprovar Descontos" id="salesman.discounts_manager"
+              action="action_discounts_approve"
+              parent="salesman_menu"/>
+
+</odoo>

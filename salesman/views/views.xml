@@ -1,0 +1,58 @@
+<odoo>
+  <data>
+    <!-- explicit list view definition -->
+    <!--
+    <record model="ir.ui.view" id="salesman.list">
+      <field name="name">salesman list</field>
+      <field name="model">salesman.salesman</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="name"/>
+          <field name="value"/>
+          <field name="value2"/>
+        </tree>
+      </field>
+    </record>
+    -->
+
+    <!-- actions opening views on models -->
+    <!--
+    <record model="ir.actions.act_window" id="salesman.action_window">
+      <field name="name">salesman window</field>
+      <field name="res_model">salesman.salesman</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+    -->
+
+    <!-- server action to the one above -->
+    <!--
+    <record model="ir.actions.server" id="salesman.action_server">
+      <field name="name">salesman server</field>
+      <field name="model_id" ref="model_salesman_salesman"/>
+      <field name="state">code</field>
+      <field name="code">
+        action = {
+          "type": "ir.actions.act_window",
+          "view_mode": "tree,form",
+          "res_model": self._name,
+        }
+      </field>
+    </record>
+    -->
+
+    <!-- Top menu item -->
+
+    <menuitem name="Vendedor" id="salesman.salesman_manager"
+      parent="sale.menu_sale_config"/>
+    <!-- menu categories
+    <menuitem name="Vendedores" id="salesman.menu_1" parent="salesman.salesman_manager"/>
+    -->
+    <!-- actions -->
+    <!--
+    <menuitem name="List" id="salesman.menu_1_list" parent="salesman.menu_1"
+              action="salesman.action_window"/>
+    <menuitem name="Server to list" id="salesman" parent="salesman.menu_2"
+              action="salesman.action_server"/>
+    -->
+  </data>
+</odoo>
