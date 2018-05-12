@@ -14,8 +14,8 @@ class SalesmanPartner(models.Model):
     _name = 'salesman.partner'
     inherits = {'res.users': 'user_id'}
 
-    partner_id = fields.Many2one('res.partner',related='user_id.partner_id',string="Parceiro",ondelete='restrict')
-    user_id = fields.Many2one('res.users', string="Vendedor",required=True, ondelete='restrict',auto_join=True)
+    partner_id = fields.Many2one('res.partner', related='user_id.partner_id', string="Parceiro",ondelete='restrict')
+    user_id = fields.Many2one('res.users', string="Vendedor",required=True, ondelete='restrict', auto_join=True)
     name = fields.Char(related='user_id.partner_id.name')
     email = fields.Char(related='user_id.email', readonly=True)
     currency_id = fields.Many2one("res.currency", related='user_id.company_id.currency_id', string="Currency",
@@ -109,6 +109,17 @@ class SalesDiscount(models.TransientModel):
     refuse = fields.Boolean(string='Negar', store=True)
 
     @api.multi
+    def _reopen_form(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'discount.approve',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'target': 'new',
+        }
+
+    @api.multi
     @api.depends('sale_order_line', 'product_uom_qty', 'price_unit', 'discount')
     def _compute_amount(self):
         for record in self:
@@ -121,10 +132,14 @@ class SalesDiscount(models.TransientModel):
         self.sale_order_line.discount_status = 'approve'
         self.sale_order_line.discount_approver = self.env.user
 
+        return self._reopen_form()
+
     @api.multi
     def refuse_discount(self):
         self.sale_order_line.discount_status = 'refuse'
         self.sale_order_line.discount_approver = self.env.user
+
+        return self._reopen_form()
 
 class SaleOrderLine(models.Model):
     _name = 'sale.order.line'
