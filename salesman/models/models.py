@@ -170,7 +170,7 @@ class SaleOrderLine(models.Model):
             category = self.product_id.product_tmpl_id.categ_id
             if len(category) > 0:
                 category_discount = self.env['salesman.discount.limits'].search([('salesman_id', '=', salesman.id),\
-                    ('category_id', '=', category.id)])
+                    ('category_id', 'in', category.id)])
                 list_categorys = self.discover_category_parents()
                 if category_discount:
                     limit_discount = category_discount.limit_discount
