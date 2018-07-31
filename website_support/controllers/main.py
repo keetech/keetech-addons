@@ -24,7 +24,8 @@ class SupportTicketController(http.Controller):
 
         if support_ticket.approval_id.id == awaiting_approval.id:
             #Change the ticket state to approved
-            website_ticket_state_approval_accepted = request.env['ir.model.data'].get_object('website_support','website_ticket_state_approval_accepted')
+            website_ticket_state_approval_accepted = request.env['ir.model.data'].get_object('website_support',
+                                                                                             'website_ticket_state_approval_accepted')
             support_ticket.state = website_ticket_state_approval_accepted.id
 
             #Also change the approval
@@ -32,13 +33,19 @@ class SupportTicketController(http.Controller):
             support_ticket.approval_id = approval_accepted.id
 
             #Send an email out to everyone in the category notifing them the ticket has been approved
-            notification_template = request.env['ir.model.data'].sudo().get_object('website_support', 'support_ticket_approval_user')
-            support_ticket_menu = request.env['ir.model.data'].sudo().get_object('website_support', 'website_support_ticket_menu')
-            support_ticket_action = request.env['ir.model.data'].sudo().get_object('website_support', 'website_support_ticket_action')
+            notification_template = request.env['ir.model.data'].sudo().get_object('website_support',
+                                                                                   'support_ticket_approval_user')
+            support_ticket_menu = request.env['ir.model.data'].sudo().get_object('website_support',
+                                                                                 'website_support_ticket_menu')
+            support_ticket_action = request.env['ir.model.data'].sudo().get_object('website_support',
+                                                                                   'website_support_ticket_action')
 
             for my_user in support_ticket.category.cat_user_ids:
                 values = notification_template.generate_email(support_ticket.id)
-                values['body_html'] = values['body_html'].replace("_ticket_url_", "web#id=" + str(support_ticket.id) + "&view_type=form&model=website.support.ticket&menu_id=" + str(support_ticket_menu.id) + "&action=" + str(support_ticket_action.id) ).replace("_user_name_",  my_user.partner_id.name)
+                values['body_html'] = values['body_html'].replace("_ticket_url_", "web#id=" + str(
+                    support_ticket.id) + "&view_type=form&model=website.support.ticket&menu_id=" + str(
+                    support_ticket_menu.id) + "&action=" + str(support_ticket_action.id)).replace("_user_name_",
+                                                                                                  my_user.partner_id.name)
                 #values['body'] = values['body_html']
                 values['email_to'] = my_user.partner_id.email
 
@@ -48,9 +55,9 @@ class SupportTicketController(http.Controller):
                 #Remove the message from the chatter since this would bloat the communication history by a lot
                 send_mail.mail_message_id.res_id = 0            
 
-            return "Request Approved Successfully"
+            return "Solicitação Aprovada com Sucesso"
         else:
-            return "Ticket does not need approval"
+            return "Ticket não requer aprovação"
 
     @http.route('/support/disapprove/<ticket_id>', type='http', auth="public")
     def support_disapprove(self, ticket_id, **kwargs):
@@ -60,7 +67,8 @@ class SupportTicketController(http.Controller):
 
         if support_ticket.approval_id.id == awaiting_approval.id:
             #Change the ticket state to disapproved
-            website_ticket_state_approval_rejected = request.env['ir.model.data'].get_object('website_support','website_ticket_state_approval_rejected')
+            website_ticket_state_approval_rejected = request.env['ir.model.data'].get_object('website_support',
+                                                                                             'website_ticket_state_approval_rejected')
             support_ticket.state = website_ticket_state_approval_rejected.id
 
             #Also change the approval
@@ -68,13 +76,19 @@ class SupportTicketController(http.Controller):
             support_ticket.approval_id = approval_rejected.id
 
             #Send an email out to everyone in the category notifing them the ticket has been approved
-            notification_template = request.env['ir.model.data'].sudo().get_object('website_support', 'support_ticket_approval_user')
-            support_ticket_menu = request.env['ir.model.data'].sudo().get_object('website_support', 'website_support_ticket_menu')
-            support_ticket_action = request.env['ir.model.data'].sudo().get_object('website_support', 'website_support_ticket_action')
+            notification_template = request.env['ir.model.data'].sudo().get_object('website_support',
+                                                                                   'support_ticket_approval_user')
+            support_ticket_menu = request.env['ir.model.data'].sudo().get_object('website_support',
+                                                                                 'website_support_ticket_menu')
+            support_ticket_action = request.env['ir.model.data'].sudo().get_object('website_support',
+                                                                                   'website_support_ticket_action')
 
             for my_user in support_ticket.category.cat_user_ids:
                 values = notification_template.generate_email(support_ticket.id)
-                values['body_html'] = values['body_html'].replace("_ticket_url_", "web#id=" + str(support_ticket.id) + "&view_type=form&model=website.support.ticket&menu_id=" + str(support_ticket_menu.id) + "&action=" + str(support_ticket_action.id) ).replace("_user_name_",  my_user.partner_id.name)
+                values['body_html'] = values['body_html'].replace("_ticket_url_", "web#id=" + str(
+                    support_ticket.id) + "&view_type=form&model=website.support.ticket&menu_id=" + str(
+                    support_ticket_menu.id) + "&action=" + str(support_ticket_action.id)).replace("_user_name_",
+                                                                                                  my_user.partner_id.name)
                 #values['body'] = values['body_html']
                 values['email_to'] = my_user.partner_id.email
 
@@ -84,9 +98,9 @@ class SupportTicketController(http.Controller):
                 #Remove the message from the chatter since this would bloat the communication history by a lot
                 send_mail.mail_message_id.res_id = 0
                 
-            return "Request Rejected Successfully"
+            return "Solicitação Recusada com sucesso"
         else:
-            return "Ticket does not need approval"
+            return "Ticket não requer aprovação"
 
     @http.route('/support/subcategories/field/fetch', type='http', auth="public", website=True)
     def support_subcategories_field_fetch(self, **kwargs):
@@ -153,7 +167,7 @@ class SupportTicketController(http.Controller):
 
         if support_ticket.support_rating:
             #TODO some security incase they guess the portal key of an incomplete survey
-            return "Survey Already Complete"
+            return "Pesquisa Concluída"
         else:
             return http.request.render('website_support.support_ticket_survey_page', {'support_ticket': support_ticket})
 
@@ -170,7 +184,7 @@ class SupportTicketController(http.Controller):
 
         if support_ticket.support_rating:
             #TODO some security incase they guess the portal key of an incomplete survey
-            return "Survey Already Complete"
+            return "Pesquisa Concluída"
         else:
             support_ticket.support_rating = values['rating']
             support_ticket.support_comment = values['comment']
@@ -185,7 +199,7 @@ class SupportTicketController(http.Controller):
         if setting_allow_user_signup:
             return http.request.render('website_support.account_create', {})
         else:
-            return "Account creation has been disabled"
+            return "A criação de conta foi desabilitada"
 
     @http.route('/support/account/create/process', type="http", auth="public", website=True)
     def support_account_create_process(self, **kw):
@@ -220,7 +234,7 @@ class SupportTicketController(http.Controller):
             #Redirect them to the support page
             return werkzeug.utils.redirect("/support/help")
         else:
-            return "Account creation has been disabled"
+            return "A criação de conta foi desabilitada"
 
     @http.route('/support/help', type="http", auth="public", website=True)
     def support_help(self, **kw):
@@ -281,11 +295,11 @@ class SupportTicketController(http.Controller):
 
         #Don't want them distorting the rating by submitting -50000 ratings
         if int(values['rating']) < 1 or int(values['rating']) > 5:
-            return "Invalid rating"
+            return "Classificação Inválida"
 
         #Feeback is required
         if values['feedback'] == "":
-            return "Feedback required"
+            return "Feedback requerido"
 
         request.env['website.support.help.page.feedback'].sudo().create({'hp_id': int(help_page), 'feedback_rating': values['rating'], 'feedback_text': values['feedback'] })
 
@@ -350,7 +364,7 @@ class SupportTicketController(http.Controller):
             partner = http.request.env.user.partner_id
 
             #Add to the communication history
-            partner.message_post(body="Customer " + partner.name + " has sent in a new support ticket", subject="New Support Ticket")
+            partner.message_post(body="Cliente " + partner.name + " enviou um novo ticket de suporte", subject="Novo Tocket de Suporte")
 
         else:
             search_partner = request.env['res.partner'].sudo().search([('email','=', values['email'] )])
@@ -367,7 +381,7 @@ class SupportTicketController(http.Controller):
                     request.env['website.support.ticket.field'].sudo().create({'wst_id': new_ticket_id.id, 'name': extra_field.name, 'value': values["efield_" + str(extra_field.id)] })
                 else:
                     #All extra fields are required
-                    return "Extra field is missing"
+                    return "Campo extra esta faltando"
 
         if 'file' in values:
 
@@ -463,7 +477,7 @@ class SupportTicketController(http.Controller):
             request.env['website.support.ticket'].sudo().browse(ticket.id).message_post(body=values['comment'], subject="Support Ticket Reply", message_type="comment")
 
         else:
-            return "You do not have permission to submit this commment"
+            return "Você não possui permissão para postar este comentário"
 
         return werkzeug.utils.redirect("/support/ticket/view/" + str(ticket.id))
 

@@ -1,11 +1,11 @@
 {
-    'name': "Website Help Desk / Support Ticket",
+    'name': "Helpdesk / Support Ticket",
     'version': "1.2.10",
     'author': "Sythil Tech",
     'category': "Tools",
     'support': "steven@sythiltech.com.au",
-    'summary': "A helpdesk / support ticket system for your website",
-    'description': "A helpdesk / support ticket system for your website",
+    'summary': "A helpdesk / Support ticket system for your website",
+    'description': "A helpdesk / Support ticket system for your website",
     'license':'LGPL-3',
     'data': [
         'data/res.groups.csv',
@@ -37,8 +37,8 @@
         'data/ir.cron.xml',
         'security/ir.model.access.csv',
     ],
-    'demo': [],
-    'depends': ['mail','web', 'crm', 'website'],
+
+    'depends': ['mail', 'web', 'crm', 'website'],
     'images':[
         'static/description/3.jpg',
         'static/description/1.jpg',

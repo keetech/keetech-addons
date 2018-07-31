@@ -3,19 +3,19 @@
     <data noupdate="1">
 
         <record id="no_approval_required" model="website.support.ticket.approval">
-            <field name="name">No Approval Required</field>
+            <field name="name">Aprovação Não Solicitada</field>
         </record>
 
         <record id="awaiting_approval" model="website.support.ticket.approval">
-            <field name="name">Awaiting Approval</field>
+            <field name="name">Aguardando Aprovação</field>
         </record>
 
         <record id="approval_accepted" model="website.support.ticket.approval">
-            <field name="name">Approval Accepted</field>
+            <field name="name">Aprovado</field>
         </record>
 
         <record id="approval_rejected" model="website.support.ticket.approval">
-            <field name="name">Approval Rejected</field>
+            <field name="name">Não Aprovado</field>
         </record>
 
         

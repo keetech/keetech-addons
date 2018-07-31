@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
-from openerp import api, fields, models
-from openerp import tools
-from random import randint
+from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT, DEFAULT_SERVER_DATE_FORMAT
+from odoo import api, fields, models,SUPERUSER_ID
+from odoo import tools
+
 import math
 import datetime
-from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT, DEFAULT_SERVER_DATE_FORMAT
 import logging
-_logger = logging.getLogger(__name__)
-from odoo import SUPERUSER_ID
+from random import randint
 from dateutil import tz
+
+_logger = logging.getLogger(__name__)
 
 class WebsiteSupportTicket(models.Model):
 
@@ -45,35 +46,37 @@ class WebsiteSupportTicket(models.Model):
     def _default_approval_id(self):
         return self.env['ir.model.data'].get_object('website_support', 'no_approval_required')
 
-    channel = fields.Char(string="Channel", default="Manual")
+    name = fields.Char(string=u'Ticket', compute='compute_ticket_name')
+    channel = fields.Char(string="Channel", default="Manual", readonly=True)
     create_user_id = fields.Many2one('res.users', "Create User")
     priority_id = fields.Many2one('website.support.ticket.priority', default=_default_priority_id, string="Priority")
-    partner_id = fields.Many2one('res.partner', string="Partner")
-    user_id = fields.Many2one('res.users', string="Assigned User")
-    person_name = fields.Char(string='Person Name')
+    partner_id = fields.Many2one('res.partner', string='Cliente')
+    user_id = fields.Many2one('res.users', string='Responsável Pelo Atendimento')
+    person_name = fields.Char(string='Solicitante')
     email = fields.Char(string="Email")
+    email_cc = fields.Char(string='Watchers Emails')
     support_email = fields.Char(string="Support Email")
-    category = fields.Many2one('website.support.ticket.categories', string="Category", track_visibility='onchange')
-    sub_category_id = fields.Many2one('website.support.ticket.subcategory', string="Sub Category")
-    subject = fields.Char(string="Subject")
-    description = fields.Text(string="Description")
+    category = fields.Many2one('website.support.ticket.categories', string="Categoria", track_visibility='onchange')
+    sub_category_id = fields.Many2one('website.support.ticket.subcategory', string="Sub-Categoria")
+    subject = fields.Char(string=u'Resumo', required=True)
+    description = fields.Text(string=u'Descrição do Problema/Suporte')
     state = fields.Many2one('website.support.ticket.states', group_expand='_read_group_state', default=_default_state, string="State")
-    conversation_history = fields.One2many('website.support.ticket.message', 'ticket_id', string="Conversation History")
-    attachment = fields.Binary(string="Attachments")
-    attachment_filename = fields.Char(string="Attachment Filename")
-    attachment_ids = fields.One2many('ir.attachment', 'res_id', domain=[('res_model', '=', 'website.support.ticket')], string="Media Attachments")
+    conversation_history = fields.One2many('website.support.ticket.message', 'ticket_id', string=u'Histórico de Mensagens')
+    attachment = fields.Binary(string=u'Anexo')
+    attachment_filename = fields.Char(string=u'Nome do Anexo')
+    attachment_ids = fields.One2many('ir.attachment', 'res_id', domain=[('res_model', '=', 'website.support.ticket')], string=u'Anexos')
     unattended = fields.Boolean(string="Unattended", compute="_compute_unattend", store="True", help="In 'Open' state or 'Customer Replied' state taken into consideration name changes")
     portal_access_key = fields.Char(string="Portal Access Key")
-    ticket_number = fields.Integer(string="Ticket Number")
-    ticket_number_display = fields.Char(string="Ticket Number Display", compute="_compute_ticket_number_display")
-    ticket_color = fields.Char(related="priority_id.color", string="Ticket Color")
-    company_id = fields.Many2one('res.company', string="Company", default=lambda self: self.env['res.company']._company_default_get('website.support.ticket') )
-    support_rating = fields.Integer(string="Support Rating")
+    ticket_number = fields.Integer(string="Número do Ticket")
+    ticket_number_display = fields.Char(string="Número do Ticket", compute="_compute_ticket_number_display")
+    ticket_color = fields.Char(related="priority_id.color", string="Cor do Ticket")
+    company_id = fields.Many2one('res.company', string="Empresa", default=lambda self: self.env['res.company']._company_default_get('website.support.ticket') )
+    support_rating = fields.Integer(string="Avaliação do Atendimento")
     support_comment = fields.Text(string="Support Comment")
     close_comment = fields.Text(string="Close Comment")
     close_time = fields.Datetime(string="Close Time")
     close_date = fields.Date(string="Close Date")
-    closed_by_id = fields.Many2one('res.users', string="Closed By")
+    closed_by_id = fields.Many2one('res.users', string="Finalizado Por")
     time_to_close = fields.Integer(string="Time to close (seconds)")
     extra_field_ids = fields.One2many('website.support.ticket.field', 'wst_id', string="Extra Details")
     planned_time = fields.Datetime(string="Planned Time")
@@ -90,10 +93,56 @@ class WebsiteSupportTicket(models.Model):
     sla_response_category_id = fields.Many2one('website.support.sla.response', string="SLA Response Category")
     sla_alert_ids = fields.Many2many('website.support.sla.alert', string="SLA Alerts", help="Keep record of SLA alerts sent so we do not resend them")
 
+    @api.model
+    def message_new(self, msg, custom_values=None):
+        """ Overrides mail_thread message_new that is called by the mailgateway
+            through message_process.
+            This override updates the document according to the email.
+        """
+        # remove default author when going through the mail gateway. Indeed we
+        # do not want to explicitly set user_id to False; however we do not
+        # want the gateway user to be responsible if no other responsible is
+        # found.
+        create_context = dict(self.env.context or {})
+        create_context['default_user_id'] = False
+        if custom_values is None:
+            custom_values = {}
+        defaults = {
+            'name': msg.get('subject') or _("No Subject"),
+            'person_name': msg.get('author_id'),
+            'partner_id': msg.get('author_id'),
+            'email': msg.get('from'),
+            'channel': 'Email',
+            'email_cc': msg.get('cc'),
+        }
+        defaults.update(custom_values)
+
+        ticket = super(WebsiteSupportTicket, self.with_context(create_context)).message_new(msg, custom_values=defaults)
+        email_list = task.email_split(msg)
+        partner_ids = [p for p in ticket._find_partner_from_emails(email_list, force_create=False) if p]
+        ticket.message_subscribe(partner_ids)
+        return ticket
+
+    @api.multi
+    def email_split(self, msg):
+        email_list = tools.email_split((msg.get('to') or '') + ',' + (msg.get('cc') or ''))
+        # check left-part is not already an alias
+        aliases = self.mapped('category.alias_name')
+        return [x for x in email_list if x.split('@')[0] not in aliases]
+
+    @api.multi
+    @api.depends('ticket_number')
+    def compute_ticket_name(self):
+        for record in self:
+            if ticket_number != False:
+                record.name = 'Ticket [%s]' + ticket_number
+            else:
+                record.name = 'Rascunho'
+
     @api.one
     @api.depends('sla_timer')
     def _compute_sla_timer_format(self):
-        #Display negative hours in a positive format
+        #Exibe horas negativas em formato positivo
         self.sla_timer_format = '{0:02.0f}:{1:02.0f}'.format(*divmod(abs(self.sla_timer) * 60, 60))
 
     @api.model
@@ -201,11 +250,11 @@ class WebsiteSupportTicket(models.Model):
         self.email = self.partner_id.email
 
     def message_new(self, msg, custom_values=None):
-        """ Create new support ticket upon receiving new email"""
+        """Cria novo ticket de suporte ao receber novo email"""
 
         defaults = {'support_email': msg.get('to'), 'subject': msg.get('subject')}
 
-        #Extract the name from the from email if you can
+        #Extrair o nome do email
         if "<" in msg.get('from') and ">" in msg.get('from'):
             start = msg.get('from').rindex( "<" ) + 1
             end = msg.get('from').rindex( ">", start )
@@ -218,7 +267,7 @@ class WebsiteSupportTicket(models.Model):
         defaults['email'] = from_email
         defaults['channel'] = "Email"
 
-        #Try to find the partner using the from email
+        #Tenta localizar o parceiro através do remetente do email
         search_partner = self.env['res.partner'].sudo().search([('email','=', from_email)])
         if len(search_partner) > 0:
             defaults['partner_id'] = search_partner[0].id
@@ -226,7 +275,7 @@ class WebsiteSupportTicket(models.Model):
 
         defaults['description'] = tools.html_sanitize(msg.get('body'))
 
-        #Assign to default category
+        #Atribui a categoria padrão
         setting_email_default_category_id = self.env['ir.default'].get('website.support.settings', 'email_default_category_id')
 
         if setting_email_default_category_id:
@@ -235,7 +284,7 @@ class WebsiteSupportTicket(models.Model):
         return super(WebsiteSupportTicket, self).message_new(msg, custom_values=defaults)
 
     def message_update(self, msg_dict, update_vals=None):
-        """ Override to update the support ticket according to the email. """
+        """ Substituir para atualizar o ticket de suporte de acordo com o email. """
 
         body_short = tools.html_sanitize(msg_dict['body'])
         #body_short = tools.html_email_clean(msg_dict['body'], shorten=True, remove=True)
@@ -257,15 +306,14 @@ class WebsiteSupportTicket(models.Model):
     @api.depends('ticket_number')
     def _compute_ticket_number_display(self):
         if self.ticket_number:
-            self.ticket_number_display = str(self.id) + " / " + "{:,}".format( self.ticket_number )
-        else:
-            self.ticket_number_display = self.id
+            self.ticket_number_display = "#" + "{:,}".format(self.ticket_number).replace(',', '.')
 
     @api.one
     @api.depends('state')
     def _compute_unattend(self):
         opened_state = self.env['ir.model.data'].get_object('website_support', 'website_ticket_state_open')
-        customer_replied_state = self.env['ir.model.data'].get_object('website_support', 'website_ticket_state_customer_replied')
+        customer_replied_state = self.env['ir.model.data'].get_object('website_support',
+                                                                      'website_ticket_state_customer_replied')
 
         if self.state == opened_state or self.state == customer_replied_state:
             self.unattended = True
@@ -316,15 +364,16 @@ class WebsiteSupportTicket(models.Model):
         
         new_id.ticket_number = new_id.company_id.next_support_ticket_number
 
-        #Add one to the next ticket number
+        #Adiciona o próximo número de ticket
         new_id.company_id.next_support_ticket_number += 1
 
-        ticket_open_email_template = self.env['ir.model.data'].get_object('website_support', 'website_ticket_state_open').mail_template_id
+        ticket_open_email_template = self.env['ir.model.data'].get_object('website_support',
+                                                                          'website_ticket_state_open').mail_template_id
         ticket_open_email_template.send_mail(new_id.id, True)
 
-        #Check if this contact has a SLA assigned
+        #Verifica se o contato possui contrato de SLA
         if new_id.partner_id.sla_id:
-            #Check if this category has a SLA response time
+            #Verifica se a categoria possui um SLA cadastrado
             category_response = self.env['website.support.sla.response'].search([('vsa_id','=',new_id.partner_id.sla_id.id), ('category_id','=',new_id.category.id)])
             if category_response:
                 new_id.sla_id = new_id.partner_id.sla_id.id
@@ -332,7 +381,7 @@ class WebsiteSupportTicket(models.Model):
                 new_id.sla_timer = category_response.response_time
                 new_id.sla_response_category_id = category_response.id
 
-        #Send an email out to everyone in the category
+        #Envia um email para todos da categoria
         notification_template = self.env['ir.model.data'].sudo().get_object('website_support', 'new_support_ticket_category')
         support_ticket_menu = self.env['ir.model.data'].sudo().get_object('website_support', 'website_support_ticket_menu')
         support_ticket_action = self.env['ir.model.data'].sudo().get_object('website_support', 'website_support_ticket_action')
@@ -387,7 +436,6 @@ class WebsiteSupportTicket(models.Model):
         return update_rec
 
     def send_survey(self):
-
         notification_template = self.env['ir.model.data'].sudo().get_object('website_support', 'support_ticket_survey')
         values = notification_template.generate_email(self.id)
         surevey_url = "support/survey/" + str(self.portal_access_key)
@@ -422,10 +470,20 @@ class WebsiteSupportTicketCategories(models.Model):
 
     _name = "website.support.ticket.categories"
     _order = "sequence asc"
+    _inherit = ['mail.alias.mixin', 'mail.thread', 'portal.mixin']
+
+    def get_alias_model_name(self, vals):
+        return vals.get('alias_model', 'website.support.ticket')
+
+    def get_alias_values(self):
+        values = super(WebsiteSupportTicketCategories, self).get_alias_values()
+        values['alias_defaults'] = {'category': self.id}
+        return values
 
     sequence = fields.Integer(string="Sequence")
     name = fields.Char(required=True, translate=True, string='Category Name')
     cat_user_ids = fields.Many2many('res.users', string="Category Users")
+    alias_id = fields.Many2one('mail.alias', string='Alias', ondelete="restrict", required=True)
 
     @api.model
     def create(self, values):

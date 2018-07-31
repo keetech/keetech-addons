@@ -17,39 +17,56 @@
                       <button type="object" name="request_approval" string="Request Approval"/>
                   </header>
                   <sheet>
+                      <div class="oe_title">
+                        <h1>
+                          <field name="ticket_number" readonly="1" attrs="{'invisible': [('ticket_number', '=', 0)]}"/>
+                          <span attrs="{'invisible': [('ticket_number', '!=', 0)]}">Número do Ticket</span>
+                        </h1>
+                      </div>
                       <group>
-                          <field name="create_user_id" invisble="True"/>
-                          <field name="ticket_number"/>
-                          <field name="channel"/>
-                          <field name="priority_id"/>
-                          <field name="user_id"/>
-                          <field name="partner_id"/>
-                          <field name="person_name"/>
-                          <field name="email"/>
-                          <field name="tag_ids" widget="many2many_tags"/>
-                          <field name="category"/>
-                          <field name="sub_category_id" domain="[('parent_category_id','=',category)]"/>
-                          <field name="state"/>
-                          <field name="approval_id"/>
-                          <field name="subject"/>
-                          <field name="description" widget="html"/>
-                          <field name="support_rating" readonly="1"/>
-                          <field name="support_comment" readonly="1"/>
-                          <field name="close_comment"/>
-                          <field name="close_time"/>
+                        <group>
+                            <field name="create_user_id" readonly="1" invisble="1"/>
+                            <field name="user_id"/>
+                            <field name="partner_id"/>
+                            <field name="person_name"/>
+                            <field name="email"/>
+                            <field name="subject"/>
+                        </group>
+                        <group>
+                            <field name="channel"/>
+                            <field name="priority_id" widget="selection"/>
+                            <field name="tag_ids" widget="many2many_tags"/>
+                            <field name="category"/>
+                            <field name="sub_category_id" domain="[('parent_category_id','=',category)]"/>
+                            <field name="state" widget="selection"/>
+                            <field name="approval_id" widget="selection"/>
+                        </group>
                       </group>
                       <notebook>
-                          <page string="Extra Fields">
-                              <group>
-                                  <field name="extra_field_ids">
-                                      <tree editable="bottom">
-                                          <field name="name"/>
-                                          <field name="value"/>
-                                      </tree>
-                                  </field>                          
-                              </group>
+                        <page string="Descrição">
+                            <field name="description" widget="html"/>
+                        </page>
+                      </notebook>
+                      <group>
+                        <group>
+                            <field name="support_rating" readonly="1"/>
+                            <field name="support_comment" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="close_comment"/>
+                            <field name="close_time"/>
+                        </group>
+                      </group>
+                      <notebook>
+                          <page string="Campos Extras">
+                            <field name="extra_field_ids">
+                                <tree editable="bottom">
+                                    <field name="name"/>
+                                    <field name="value"/>
+                                </tree>
+                            </field>                          
                           </page>
-                          <page string="Attachments">
+                          <page string="Anexos">
                               <group>
                                   <field name="attachment_ids" attrs="{'invisible' :[('attachment_ids', '=', [])]}">
                                       <tree>
@@ -179,10 +196,14 @@
               </p>
           </field>
       </record>
+      <menuitem id="crm_helpdesk_root" name="Helpdesk"
+            web_icon="website_support,static/description/icon.png"
+            groups="sales_team.group_sale_salesman,sales_team.group_sale_manager"/>
 
-      <menuitem id="website_support_parent_menu" name="Customer Support" parent="crm.crm_menu_root" sequence="90" groups="sales_team.group_sale_salesman_all_leads,sales_team.group_sale_manager,support_group"/>
-      <menuitem id="website_support_ticket_menu" name="Support Tickets" parent="website_support_parent_menu" action="website_support_ticket_action" sequence="10"/>
-      <menuitem id="website_support_config_parent_menu" name="Support Tickets" parent="crm.crm_menu_config" sequence="80"/>
+      <menuitem id="website_support_parent_menu" name="Atendimentos" parent="crm_helpdesk_root" sequence="10" groups="sales_team.group_sale_salesman_all_leads,sales_team.group_sale_manager,support_group"/>
+      <menuitem id="website_support_ticket_menu" name="Tickets" parent="website_support_parent_menu" action="website_support_ticket_action" sequence="10"/>
+      <menuitem id="website_support_config_menu" name="Configurações" parent="crm_helpdesk_root" sequence="90" groups="sales_team.group_sale_salesman_all_leads,sales_team.group_sale_manager,support_group"/>
+      <menuitem id="website_support_config_parent_menu" name="Tickets" parent="website_support_config_menu"/>
 
     </data>
 </odoo>
