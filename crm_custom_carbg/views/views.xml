@@ -1,0 +1,74 @@
+<odoo>
+  <data>
+    <record model="ir.ui.view" id="partner_custom_carbg">
+      <field name="name">partner_custom_carbg</field>
+      <field name="model">res.partner</field>
+      <field name="inherit_id" ref="base.view_partner_form"/>
+      <field name="arch" type="xml">
+        <!-- Ajusto no tamanho da fonte do nome do cliente -->
+        <xpath expr="//sheet/div[2]/h1" position="replace">
+          <h2>
+              <field name="name" default_focus="1" placeholder="Name" attrs="{'required' : [('type', '=', 'contact')]}"/>
+          </h2>
+        </xpath>
+        <xpath expr="//group[@name='container_row_2']/group/field[@name='customer']" position="before">
+          <field name="is_prospect"/>
+        </xpath>
+        <!-- Incluindo o campo de data de aniversário de uma pessoa -->
+        <field name="user_id" position="replace"/>
+        <!-- Retirando alguns campos sem utilidade para o cliente -->
+        <field name="vat" position="replace"/>
+        <field name="industry_id" position="replace"/>
+        <field name="opt_out" position="replace"/>
+        <field name="message_bounce" position="replace"/>
+        <xpath expr="//notebook" position="inside">
+          <page string="Informações Comerciais">
+              <form>
+                <group>
+                    <field name="current_supplier"/>
+                    <field name="current_supplier_contract"/>
+                    <field name="commercial_segment" string="Segmento Comercial" attrs="{'invisible': ['|',('company_type', '!=', 'company'),('customer','=',False),
+                        ('is_prospect','=',False)]}"/>
+                </group>
+              </form>
+              <field name="commercial_info" mode="tree">
+                <tree string="Informações" editable="top">
+                    <field name="products"/>
+                    <field name="application"/>
+                    <field name="price"/>
+                    <field name="volume"/>
+                </tree>
+              </field>
+          </page>
+            <page string="Contratos">
+              <field name="contract_info" mode="tree">
+                <tree string="Informações de Contratos" editable="top">
+                    <field name="products" widget="many2many_tags"/>
+                    <field name="internal_ref"/>
+                    <field name="date_start"/>
+                    <field name="date_end"/>
+                    <field name="contract_term"/>
+                    <field name="deadline_complaint"/>
+                    <field name="date_complaint"/>
+                    <field name="lending_istrue"/>
+                </tree>
+              </field>
+          </page>
+        </xpath>
+      </field>
+    </record>
+
+    <record model="ir.ui.view" id="partner_custom_carbg2">
+      <field name="name">partner_custom_carbg2</field>
+      <field name="model">res.partner</field>
+      <field name="inherit_id" ref="crm.view_partners_form_crm1"/>
+      <field name="arch" type="xml">
+        <xpath expr="//button[@name='138']" position="replace">
+          <button class="oe_stat_button o_res_partner_tip_opp" type="action" name="138" icon="fa-star" context="{'search_default_partner_id': active_id}">
+              <field string="Opportunidades" name="opportunity_count" widget="statinfo"/>
+          </button>
+        </xpath>
+      </field>
+    </record>
+  </data>
+</odoo>

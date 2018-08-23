@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<openerp>
+   <data>
+     <record id="view_receitaws_partner_form" model="ir.ui.view">
+        <field name="name">receitaws.partner.form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="br_base.view_br_base_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_check_sefaz']" position="replace">
+                <button name="cnpj_search" type="object" class="oe_stat_button"
+                    icon="fa-search" string="Receita WS" attrs="{'invisible': [('company_type', '=', 'person')]}">
+                </button>
+            </xpath>
+        </field>
+     </record>
+   </data>
+</openerp>
