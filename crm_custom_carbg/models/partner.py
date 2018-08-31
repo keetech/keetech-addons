@@ -9,10 +9,10 @@ class ResPartner(models.Model):
 
     is_prospect = fields.Boolean(string=u'É um Prospecto', default=False)
 
-    commercial_segment = fields.Selection([('01', u'Aliemntos & Bebidas'), ('02', u'Química & Energia'),
+    commercial_segment = fields.Selection([('01', u'Alimentos & Bebidas'), ('02', u'Química & Energia'),
                                            ('03', u'Metalurgia'), ('04', u'Manufatura'), ('05', u'Medicinal'),
                                            ('06', u'Eletrônicos'), ('07', u'Distribuidor/Revendedor'),
-                                           ('08', u'COncorrentes'), ('09', u'Outros')])
+                                           ('08', u'Outros')])
 
 
     @api.onchange('is_prospect')

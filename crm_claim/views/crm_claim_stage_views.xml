@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <odoo>
-
+    <!--
     <record id="crm_claim_stage_tree" model="ir.ui.view">
         <field name="name">crm.claim.stage.tree</field>
         <field name="model">crm.claim.stage</field>
@@ -48,4 +48,5 @@
     <menuitem id="menu_claim_stage_view" name="Stages"
               action="crm_claim_stage_act" parent="menu_config_claim" sequence="20"/>
 
+    -->
 </odoo>

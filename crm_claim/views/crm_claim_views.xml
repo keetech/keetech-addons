@@ -26,55 +26,55 @@
         <field name="arch" type="xml">
             <form string="Reclamação">
                 <header>
-                    <field name="stage_id" widget="statusbar" clickable="True"/>
+                    <field name="stage_id" widget="statusbar"/>
+                    <button name="solve_claim" string="Reclamação Solucionada" type="object" class="oe_highlight"
+                        attrs="{'invisible': [('stage_id', 'in', ['solved', 'rejected'])]}"/>
+                    <button name="rejected_claim" string="Reclamação Não Solucionada" type="object" class="oe_highlight"
+                        attrs="{'invisible': [('stage_id', 'in', ['solved', 'rejected'])]}"/>
                 </header>
+                <field name="team_id" invisible="1"/>
                 <sheet string="Claims">
                     <group>
-                        <field name="name"/>
-                        <field name="date"/>
+                        <field name="name" attrs="{'readonly': [('stage_id', 'in', ['solved', 'rejected'])]}"/>
+                        <field name="date" attrs="{'readonly': [('stage_id', 'in', ['solved', 'rejected'])]}"/>
                     </group>
                     <group colspan="4" col="4"  groups="base.group_user">
-                        <field name="priority" widget="Prioridade"/>
-                        <field name="date_deadline"/>
-                        <field name="date_closed" />
+                        <field name="priority" widget="Prioridade"
+                            attrs="{'readonly': [('stage_id', 'in', ['solved', 'rejected'])]}"/>
+                        <field name="date_deadline"
+                            attrs="{'readonly': [('stage_id', 'in', ['solved', 'rejected'])]}"/>
+                        <field name="date_closed"
+                            attrs="{'readonly': [('stage_id', 'in', ['solved', 'rejected'])]}"/>
                     </group>
                     <group colspan="4" col="4">
                         <notebook>
                             <page string="Descrição da Reclamação">
-                                <group colspan="2" col="2" groups="base.group_user">
-                                    <separator colspan="2" string="Responsável"/>
-                                    <field name="partner_id" string="Cliente"/>
-                                    <field name="partner_phone"/>
-                                    <field name="email_from" widget="email"/>
-                                </group>
-                                <group colspan="2" col="2" groups="base.group_user">
-                                    <separator colspan="2" string="Responsáveis"/>
-                                    <field name="user_id" context="{'default_groups_ref': ['base.group_user', 'base.group_partner_manager', 'base.group_sale_salesman_all_leads']}"/>
-                                    <field name="categ_id" options="{'no_create': True, 'no_open': True}"/>
-                                    <field name="team_id"/>
-                                    <field name="model_ref_id" widget="reference"/>
+                                <group>
+                                    <group string="Reclamante" groups="base.group_user">
+                                        <field name="partner_id" string="Cliente"
+                                            attrs="{'readonly': [('stage_id', 'in', ['solved', 'rejected'])]}"/>
+                                        <field name="claimant"
+                                            attrs="{'readonly': [('stage_id', 'in', ['solved', 'rejected'])]}"/>
+                                        <field name="partner_phone"
+                                            attrs="{'readonly': [('stage_id', 'in', ['solved', 'rejected'])]}"/>
+                                        <field name="email_from" widget="email"
+                                            attrs="{'readonly': [('stage_id', 'in', ['solved', 'rejected'])]}"/>
+                                    </group>
+                                    <group string="Responsáveis" groups="base.group_user">
+                                        <field name="user_id" string="Recebida Por" context="{'default_groups_ref': ['base.group_user', 'base.group_partner_manager', 'base.group_sale_salesman_all_leads']}"/>
+                                        <field name="solve_partner"/>
+                                        <field name="categ_id" options="{'no_create': True, 'no_open': True}"/>
+                                        <field name="problem_origin"/>
+                                        <field name="model_ref_id" widget="reference" invisible="1"/>
+                                    </group>
                                 </group>
                                 <separator colspan="4" string="Descrição da Reclamação" groups="base.group_user"/>
                                 <field name="description" colspan="4" nolabel="1" placeholder="Descreva a Reclamação"/>
-                            </page>
-                            <page string="Acompanhamento" groups="base.group_user">
-                                <group colspan="2" col="2">
-                                    <separator colspan="2" string="Ações"/>
-                                    <field name="date_action_next"/>
-                                    <field name="action_next"/>
-                                </group>
-
-                                <group colspan="2" col="2" groups="base.group_no_one">
-                                    <separator colspan="2" string="Datas"/>
-                                    <field name="create_date"/>
-                                    <field name="date_closed" invisible="1"/>
-                                    <field name="write_date"/>
-                                </group>
-
                                 <group colspan="2" col="2">
                                     <separator colspan="2" string="Ações Para Resolver"/>
                                     <field name="type_action"/>
-                                    <field name="resolution" colspan="2" nolabel="1" placeholder="Descreva a Solução..."/>
+                                    <field name="resolution" colspan="2" nolabel="1" placeholder="Descreva a Solução..."
+                                        attrs="{'readonly': [('stage_id', 'in', ['solved', 'rejected'])]}"/>
                                 </group>
                             </page>
                         </notebook>
