@@ -8,7 +8,6 @@ class ResPartner(models.Model):
     _inherit = "res.partner"
 
     is_prospect = fields.Boolean(string=u'É um Prospecto', default=False)
-
     commercial_segment = fields.Selection([('01', u'Alimentos & Bebidas'), ('02', u'Química & Energia'),
                                            ('03', u'Metalurgia'), ('04', u'Manufatura'), ('05', u'Medicinal'),
                                            ('06', u'Eletrônicos'), ('07', u'Distribuidor/Revendedor'),
@@ -32,6 +31,10 @@ class ResPartner(models.Model):
                                       string=u'Informações Comerciais')
     contract_info = fields.One2many('partner.contract.info', 'partner_id', string=u'Informações de Contratos',
                                     auto_join=True)
+
+    # Vincular produtos da lista de preços ao cliente
+    products_id = fields.One2many(related='property_product_pricelist.item_ids', string='Produtos Relacionados',
+                                  readonly=True,)
 
 class PartnerCommercialInfo(models.Model):
 

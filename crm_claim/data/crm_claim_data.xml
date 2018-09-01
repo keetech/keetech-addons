@@ -13,26 +13,4 @@
     <record model="utm.campaign" id="claim_source2">
         <field name="name">Preventiva</field>
     </record>
-    <!--
-    <record model="crm.claim.stage" id="stage_claim1">
-        <field name="name">Nova</field>
-        <field name="sequence">1</field>
-        <field name="case_default" eval="True"/>
-    </record>
-    <record model="crm.claim.stage" id="stage_claim5">
-        <field name="name">Em Progresso</field>
-        <field name="sequence">27</field>
-        <field name="case_default" eval="True"/>
-    </record>
-    <record model="crm.claim.stage" id="stage_claim2">
-        <field name="name">Solucionada</field>
-        <field name="sequence">28</field>
-        <field name="case_default" eval="True"/>
-    </record>
-    <record model="crm.claim.stage" id="stage_claim3">
-        <field name="name">Rejeitada</field>
-        <field name="sequence">29</field>
-        <field name="case_default" eval="True"/>
-    </record>
-    -->
 </odoo>

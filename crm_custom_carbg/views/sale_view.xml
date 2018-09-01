@@ -1,0 +1,26 @@
+<odoo>
+    <data>
+        <record id="carbg_view_order_form" model="ir.ui.view">
+            <field name="name">carbg.sale.order.form</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='partner_shipping_id']" position="after">
+                    <field name="partner_products_id" invisible="1"/>
+                </xpath>
+                <xpath expr="//field[@name='pricelist_id']" position="attributes">
+                    <attribute name="readonly">True</attribute>
+                </xpath>
+                <xpath expr="//tree/field[@name='product_id']" position="replace">
+                    <field name="product_id"
+                        attrs="{'readonly': [('product_updatable', '=', False)]}"
+                        domain="[('id', 'in', parent.partner_products_id)]"
+                        force_save="1"
+                        options="{'no_create': True}"
+                        context="{'partner_id':parent.partner_id, 'quantity':product_uom_qty, 'pricelist':parent.pricelist_id, 'uom':product_uom, 'company_id': parent.company_id}"
+                       />
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

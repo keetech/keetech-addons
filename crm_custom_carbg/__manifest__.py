@@ -13,10 +13,11 @@
     'category': 'CRM',
     'version': '11.0.0.1',
 
-    'depends': ['base', 'crm', 'crm_claim'],
+    'depends': ['base', 'crm', 'crm_claim', 'sale'],
 
     'data': [
         'views/views.xml',
+        'views/sale_view.xml',
         'security/ir.model.access.csv',
     ],
 }

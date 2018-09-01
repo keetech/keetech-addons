@@ -21,7 +21,21 @@
         <field name="industry_id" position="replace"/>
         <field name="opt_out" position="replace"/>
         <field name="message_bounce" position="replace"/>
+        <xpath expr="//field[@name='property_product_pricelist']" position="replace"/>
         <xpath expr="//notebook" position="inside">
+          <page string="Produtos Vendáveis">
+              <form>
+                  <group>
+                      <field name="property_product_pricelist" string="Lista de Produtos/Preços"/>
+                  </group>
+              </form>
+              <field name="products_id">
+                  <tree>
+                      <field name="name"/>
+                      <field name="fixed_price"/>
+                  </tree>
+              </field>
+          </page>
           <page string="Informações Comerciais">
               <form>
                 <group>
