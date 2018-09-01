@@ -24,6 +24,10 @@ class ResPartner(models.Model):
         if self.customer == True:
             self.is_prospect = False
 
+    # Misc fields
+    send_mail = fields.Boolean(string=u'Enviar Email?', default=False)
+    dealer = fields.Boolean(string=u'Revendedor', default=False)
+
     # Informações Estratégicas do Prospecto
     current_supplier = fields.Char(string=u'Fornecedor Atual')
     current_supplier_contract = fields.Boolean(string=u'Possui Contrato?')

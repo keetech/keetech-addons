@@ -13,7 +13,11 @@
         </xpath>
         <xpath expr="//group[@name='container_row_2']/group/field[@name='customer']" position="before">
           <field name="is_prospect"/>
+          <field name="dealer"/>
         </xpath>
+          <xpath expr="//field[@name='ref']" position="after">
+              <field name="send_mail"/>
+          </xpath>
         <!-- Incluindo o campo de data de aniversário de uma pessoa -->
         <field name="user_id" position="replace"/>
         <!-- Retirando alguns campos sem utilidade para o cliente -->
@@ -41,8 +45,9 @@
                 <group>
                     <field name="current_supplier"/>
                     <field name="current_supplier_contract"/>
-                    <field name="commercial_segment" string="Segmento Comercial" attrs="{'invisible': ['|',('company_type', '!=', 'company'),('customer','=',False),
-                        ('is_prospect','=',False)]}"/>
+                    <field name="commercial_segment" string="Segmento Comercial"
+                           attrs="{'invisible': ['|',('company_type', '!=', 'company'),('customer','=',False),
+                                ('is_prospect','=',False)]}"/>
                 </group>
               </form>
               <field name="commercial_info" mode="tree">
@@ -68,6 +73,30 @@
                 </tree>
               </field>
           </page>
+        </xpath>
+      </field>
+    </record>
+
+    <record model="ir.ui.view" id="crm_lead_form_simple_carbg2">
+      <field name="name">crm.lead.form.simple.carbg2</field>
+      <field name="model">crm.lead</field>
+      <field name="inherit_id" ref="crm.view_create_opportunity_simplified"/>
+      <field name="arch" type="xml">
+          <xpath expr="//field[@name='partner_id']" position="replace">
+              <field name="partner_id" context="{'search_default_customer': 1}"/>
+          </xpath>
+      </field>
+    </record>
+
+    <record id="view_res_partner_filter_carbg" model="ir.ui.view">
+      <field name="name">res.partner.select.carbg</field>
+      <field name="model">res.partner</field>
+      <field name="inherit_id" ref="base.view_res_partner_filter"/>
+      <field name="arch" type="xml">
+        <xpath expr="//field[@name='category_id']" position="before">
+            <filter string="Revendedor" name="dealer" domain="[('dealer','=',1)]"/>
+            <filter string="Prospecto" name="prospect" domain="[('is_prospect','=',1)]"/>
+            <separator/>
         </xpath>
       </field>
     </record>
