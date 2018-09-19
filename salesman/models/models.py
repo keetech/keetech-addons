@@ -3,7 +3,7 @@
 from ast import literal_eval
 from odoo import models, fields, api, _
 import datetime, calendar
-from odoo.exceptions import UserError, AccessError
+from odoo.exceptions import UserError, AccessError, ValidationError
 
 class Partner(models.Model):
     _name = 'res.partner'

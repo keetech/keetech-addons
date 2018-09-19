@@ -110,6 +110,12 @@
           <button class="oe_stat_button o_res_partner_tip_opp" type="action" name="138" icon="fa-star" context="{'search_default_partner_id': active_id}">
               <field string="Opportunidades" name="opportunity_count" widget="statinfo"/>
           </button>
+          <button class="oe_stat_button o_res_partner_tip_opp" type="action"
+                  name="%(crm_custom_carbg.crm_lead_lost_opportunities)d"
+                  icon="fa-exclamation-circle"
+                  context="{'search_default_partner_id': active_id}">
+              <field string="Oport. Perdidas" name="opportunity_lost_count" widget="statinfo"/>
+          </button>
         </xpath>
       </field>
     </record>

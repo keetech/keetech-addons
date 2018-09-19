@@ -1,3 +1,5 @@
 "id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
 "access_contract_partner","partner_contract all","model_partner_contract_info","base.group_user",1,1,1,1
 "access_commercial_partner","partner_commercial_info all","model_partner_commercial_info","base.group_user",1,1,1,1
+"access_crm_suggestions","crm_suggestions all","model_crm_suggestions","base.group_user",1,1,1,1
+"access_crm_technical_called","crm_technical_called all","model_crm_technical_called","base.group_user",1,1,1,1

@@ -7,12 +7,19 @@ class ResPartner(models.Model):
 
     _inherit = "res.partner"
 
+    opportunity_lost_count = fields.Integer("Oportunidades Perdidas", compute='_compute_opportunity_lost_count')
     is_prospect = fields.Boolean(string=u'É um Prospecto', default=False)
     commercial_segment = fields.Selection([('01', u'Alimentos & Bebidas'), ('02', u'Química & Energia'),
                                            ('03', u'Metalurgia'), ('04', u'Manufatura'), ('05', u'Medicinal'),
                                            ('06', u'Eletrônicos'), ('07', u'Distribuidor/Revendedor'),
                                            ('08', u'Outros')])
 
+    @api.multi
+    def _compute_opportunity_lost_count(self):
+        for partner in self:
+            operator = 'child_of' if partner.is_company else '='  # the opportunity count should counts the opportunities of this company and all its contacts
+            partner.opportunity_lost_count = self.env['crm.lead'].search_count(
+                [('partner_id', operator, partner.id), ('type', '=', 'opportunity'), ('active', '=', False)])
 
     @api.onchange('is_prospect')
     def change_prospect(self):

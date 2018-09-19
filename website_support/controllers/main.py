@@ -416,9 +416,15 @@ class SupportTicketController(http.Controller):
         support_tickets = http.request.env['website.support.ticket'].sudo().search(['|', ('partner_id','=',http.request.env.user.partner_id.id), ('partner_id', 'in', extra_access), ('partner_id','!=',False) ])
 
         no_approval_required = request.env['ir.model.data'].get_object('website_support','no_approval_required')
-        change_requests = http.request.env['website.support.ticket'].sudo().search(['|', ('partner_id','=',http.request.env.user.partner_id.id), ('partner_id', 'in', extra_access), ('partner_id','!=',False), ('approval_id','!=',no_approval_required.id) ], order="planned_time desc")
+        change_requests = http.request.env['website.support.ticket'].sudo().search(
+            ['|', ('partner_id', '=', http.request.env.user.partner_id.id), ('partner_id', 'in', extra_access),
+             ('partner_id', '!=', False), ('approval_id', '!=', no_approval_required.id)], order="planned_time desc")
 
-        return http.request.render('website_support.support_ticket_view_list', {'support_tickets':support_tickets,'ticket_count':len(support_tickets), 'change_requests': change_requests, 'request_count': len(change_requests)})
+        return http.request.render('website_support.support_ticket_view_list',
+                                   {'support_tickets': support_tickets,
+                                    'ticket_count': len(support_tickets),
+                                    'change_requests': change_requests,
+                                    'request_count': len(change_requests)})
 
     @http.route('/support/ticket/view/<ticket>', type="http", auth="user", website=True)
     def support_ticket_view(self, ticket):

@@ -16,8 +16,9 @@
     'depends': ['base', 'crm', 'crm_claim', 'sale'],
 
     'data': [
-        'views/views.xml',
         'views/sale_view.xml',
+        'views/crm.xml',
+        'views/views.xml',
         'security/ir.model.access.csv',
     ],
 }

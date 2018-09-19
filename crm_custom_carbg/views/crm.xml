@@ -1,0 +1,114 @@
+<odoo>
+    <record model="ir.ui.view" id="crm_technical_called_form">
+      <field name="name">crm_technical_called_form</field>
+      <field name="model">crm.technical.called</field>
+      <field name="arch" type="xml">
+        <form>
+            <header>
+                <field name="state" widget="statusbar"/>
+                <button name="missing_called" string="Suporte Não Atendido" type="object" class="oe_highlight"
+                        attrs="{'invisible':[('state','in',['done', 'missing'])]}"/>
+                <button name="done_called" string="Suporte Atendido" type="object" class="oe_highlight"
+                        attrs="{'invisible':[('state','in',['done', 'missing'])]}"/>
+            </header>
+            <sheet>
+                <group>
+                    <group>
+                        <field name="partner_id"/>
+                        <field name="responsible"/>
+                    </group>
+                    <group>
+                        <field name="date"/>
+                        <field name="deadline"/>
+                    </group>
+                </group>
+                <field name="description" placeholder="Descrição..."/>
+            </sheet>
+        </form>
+      </field>
+    </record>
+
+    <record id="crm_technical_called_list" model="ir.ui.view">
+        <field name="name">crm_technical_called_list</field>
+        <field name="model">crm.technical.called</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="partner_id"/>
+                <field name="date"/>
+                <field name="deadline"/>
+                <field name="responsible"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="crm_technical_called_action" model="ir.actions.act_window">
+        <field name="name">Suporte Técnico</field>
+        <field name="res_model">crm.technical.called</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{}</field>
+        <field name="domain">[]</field>
+    </record>
+
+    <record model="ir.ui.view" id="crm_suggestions_form">
+      <field name="name">crm_suggestions_form</field>
+      <field name="model">crm.suggestions</field>
+      <field name="arch" type="xml">
+        <form>
+            <sheet>
+                <group>
+                    <group>
+                        <field name="partner_id"/>
+                        <field name="reporter"/>
+                    </group>
+                    <group>
+                        <field name="suggestion"/>
+                        <field name="date"/>
+                    </group>
+                </group>
+                <field name="description" placeholder="Descrição..."/>
+            </sheet>
+        </form>
+      </field>
+    </record>
+
+    <record id="crm_suggestions_list" model="ir.ui.view">
+        <field name="name">crm_suggestions_list</field>
+        <field name="model">crm.suggestions</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="partner_id"/>
+                <field name="date"/>
+                <field name="reporter"/>
+                <field name="suggestion"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="crm_suggestions_action" model="ir.actions.act_window">
+        <field name="name">Sugestões e Elogios</field>
+        <field name="res_model">crm.suggestions</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{}</field>
+        <field name="domain">[]</field>
+    </record>
+
+    <record model="ir.actions.act_window" id="crm_lead_lost_opportunities">
+        <field name="name">Opportunities Perdidas</field>
+        <field name="res_model">crm.lead</field>
+        <field name="view_mode">kanban,tree,graph,pivot,form,calendar</field>
+        <field name="domain">[('type','=','opportunity'),('active','=',False)]</field>
+        <field name="context">{'default_type': 'opportunity'}</field>
+    </record>
+
+    <menuitem action="crm_technical_called_action"
+              id="menu_crm_technical_called_action"
+              parent="crm_claim.menu_aftersale"/>
+
+    <menuitem action="crm_suggestions_action"
+              id="menu_crm_suggestions_action"
+              parent="crm_claim.menu_aftersale"/>
+
+</odoo>
