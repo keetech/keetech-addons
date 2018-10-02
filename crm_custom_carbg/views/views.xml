@@ -46,8 +46,9 @@
                     <field name="current_supplier"/>
                     <field name="current_supplier_contract"/>
                     <field name="commercial_segment" string="Segmento Comercial"
-                           attrs="{'invisible': ['|',('company_type', '!=', 'company'),('customer','=',False),
-                                ('is_prospect','=',False)]}"/>
+                           attrs="{'invisible': [('customer','=',False), ('is_prospect','=',False)]}"/>
+                    <field name="commercial_subsegment" string="Sub-Segmento Comercial"
+                           attrs="{'invisible': [('customer','=',False), ('is_prospect','=',False)]}"/>
                 </group>
               </form>
               <field name="commercial_info" mode="tree">

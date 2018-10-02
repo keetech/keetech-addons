@@ -64,3 +64,19 @@ class CrmSuggestions(models.Model):
                 label = u'[%s] Elogio - ' % record.id
                 record.name = label + record.partner_id.name
 
+
+class CrmCallLog(models.Model):
+
+    _name = "crm.call.log"
+
+    name = fields.Char(compute='_compute_name')
+    partner_id = fields.Many2one('res.partner', string=u'Cliente', required=True)
+    reporter = fields.Char(string=u'Recebida/Realizada por', required=True)
+    date = fields.Date(string=u'Data', required=True)
+    description = fields.Char(string=u'Descrição', required=True)
+
+    def _compute_name(self):
+        for record in self:
+            label = u'[%s] Ligação - %s' % (record.id, record.partner_id.name)
+            record.name = label
+

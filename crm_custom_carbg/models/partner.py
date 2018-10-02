@@ -14,6 +14,22 @@ class ResPartner(models.Model):
                                            ('06', u'Eletrônicos'), ('07', u'Distribuidor/Revendedor'),
                                            ('08', u'Outros')])
 
+    commercial_subsegment = fields.Selection([('01', u'Alimentos & Bebidas'),
+                                              ('02', u'Construções, minerais e mineração'),
+                                              ('03', u'Distribuidor / Revendedor'),
+                                              ('04', u'Duas  e quatro rodas & Componentes'),
+                                              ('05', u'Eletroeletrônicos / Bens de informática  & Componentes'),
+                                              ('06', u'Festas & Decorações'),
+                                              ('07', u'Manufatura'),
+                                              ('08', u'Medicinal'),
+                                              ('09', u'Metalúrgico'),
+                                              ('10', u'Naval'),
+                                              ('11', u'Outros'),
+                                              ('12', u'Plásticos'),
+                                              ('13', u'Químico / Resíduos'),
+                                              ('14', u'Refrigeração e Ar Condicionado - Fabricação / instalação / manutenção'),
+                                              ('15', u'Transporte / Logística / Naval')], string=u'Sub Segmentação')
+
     @api.multi
     def _compute_opportunity_lost_count(self):
         for partner in self:
