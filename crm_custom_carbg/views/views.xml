@@ -19,7 +19,7 @@
               <field name="send_mail"/>
           </xpath>
         <!-- Incluindo o campo de data de aniversário de uma pessoa -->
-        <field name="user_id" position="replace"/>
+        <!-- <field name="user_id" position="replace"/> -->
         <!-- Retirando alguns campos sem utilidade para o cliente -->
         <field name="vat" position="replace"/>
         <field name="industry_id" position="replace"/>
