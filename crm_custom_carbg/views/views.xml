@@ -1,4 +1,4 @@
-<odoo>
+/<odoo>
   <data>
     <record model="ir.ui.view" id="partner_custom_carbg">
       <field name="name">partner_custom_carbg</field>
@@ -18,8 +18,9 @@
           <xpath expr="//field[@name='ref']" position="after">
               <field name="send_mail"/>
           </xpath>
-        <!-- Incluindo o campo de data de aniversário de uma pessoa -->
-        <field name="user_id" position="replace"/>
+        <!-- Incluindo o campo de data de aniversário de uma pessoa-->
+        <!-- 29/11/2018 tirando da ocultação o campo user_id -->
+        <!-- <field name="user_id" position="replace"/> -->
         <!-- Retirando alguns campos sem utilidade para o cliente -->
         <field name="vat" position="replace"/>
         <field name="industry_id" position="replace"/>
