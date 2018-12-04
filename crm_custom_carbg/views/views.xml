@@ -18,7 +18,7 @@
           <xpath expr="//field[@name='ref']" position="after">
               <field name="send_mail"/>
           </xpath>
-        <!-- Incluindo o campo de data de aniversário de uma pessoa -->
+        <!-- Incluindo o campo de data de aniversário de uma pessoa | desocultando o campo vendedor no crm da carboxi -->
         <!-- <field name="user_id" position="replace"/> -->
         <!-- Retirando alguns campos sem utilidade para o cliente -->
         <field name="vat" position="replace"/>
